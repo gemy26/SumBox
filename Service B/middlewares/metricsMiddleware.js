@@ -1,4 +1,4 @@
-const metrics = require('../metrics/prometheus.metrices');
+const metrics = require('../metrics/prometheusMetrices');
 
 module.exports = function (req, res, next) {
     const end = metrics.http_response_rate_histogram.startTimer();

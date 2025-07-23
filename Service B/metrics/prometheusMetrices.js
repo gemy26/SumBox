@@ -8,7 +8,7 @@ const http_request_total = new client.Counter({
 
 const kafka_message_latency_seconds = new client.Histogram({
     name : "kafka_message_latency_seconds",
-    help : "Time from Kafka message production to consumption in seconds",
+    help : "Time from kafka message production to consumption in seconds",
     labelNames : ["topic", "partition", "status"],
     buckets: [0.05, 0.1, 0.3, 0.5, 1, 2, 5, 10, 30]
 })

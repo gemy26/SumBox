@@ -47,7 +47,7 @@ async function startServer() {
             //payload is the sum value 
             
         } catch (err) {
-            console.error('Kafka error:', err);
+            console.error('kafka error:', err);
         }
     }
 }

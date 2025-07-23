@@ -1,8 +1,8 @@
 const express = require('express');
 const fs = require('fs');
-const startKafka = require('./Consumer');
-const {register} = require('./metrics/prometheus.metrices');
-const metricsMiddleware = require('./Middlewares/metricsMiddleware');
+const startKafka = require('./kafka/kafkaConsumer');
+const {register} = require('./metrics/prometheusMetrices');
+const metricsMiddleware = require('./middlewares/metricsMiddleware');
 const app = express();
 
 startKafka();
