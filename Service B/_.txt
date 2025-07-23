@@ -1,0 +1,8 @@
+rest service recieve sum of two numbers through kafka queue and then sum 
+the latest value with the new one 
+and it esxposes only one endpoint returns the value 
+
+
+/*
+Can you please gimme file structure for that service with naming changes and ordering if found and also if there is adding items
+*/
