@@ -10,6 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "kafkajs": "^2.2.4",
     "prom-client": "^15.1.3"

@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: 'Custom Dashboards'
+    orgId: 1
+    folder: ''         # Or a folder name in Grafana
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards   # Must match the volume in docker-compose

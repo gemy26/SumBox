@@ -8,7 +8,7 @@ class KafkaConsumer {
             clientId: process.env.KAFKA_CLIENT_ID,
             brokers: [process.env.KAFKA_BROKERS]
         });
-        this.consumer = this.kafka.consumer();
+        this.consumer = this.kafka.consumer({ groupId: 'summation-group' });
         this.connected = false;
     }
 
@@ -31,16 +31,26 @@ class KafkaConsumer {
             })
 
             await this.consumer.run({
-                "eachMessage" : async (result) => {
-                    const now = Date.now() / 1000;
-                    const latency = now - result.message.value.produced_at;
-                    queue_latency.observe(latency);
+                "eachMessage" : async ({ topic, partition, message }) => {
+                    try{
+                        const raw = message.value.toString();
+                        const parsed = JSON.parse(raw);
 
-                    console.log(`Recieved message: ${JSON.stringify(result.message.value)} on topic: ${result.topic}`)
+                        const now = Date.now() / 1000;
+                        const latency = now - parsed.produced_at;
+                        queue_latency.observe(
+                            { topic, partition: partition.toString(), status: 'success' },
+                            latency
+                        );
 
-                    let recievedData = parseInt(result.message.value.payload) || 0;
-                    storageService.saveFileData(recievedData + storageService.getFileData());
 
+                        console.log(`Recieved message: ${JSON.stringify(parsed)} on topic: ${topic}`);
+
+                        let recievedData = parseInt(parsed.message.payload.sum) || 0;
+                        storageService.saveFileData(recievedData + storageService.getFileData());
+                    }catch (err){
+                        console.error(`There is an error ${err}`);
+                    }
                 }
             })
 

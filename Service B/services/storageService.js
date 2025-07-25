@@ -1,5 +1,6 @@
 const fs = require('fs');
-const filePath =  '../files/data.txt';
+const path = require('path');
+const filePath = path.join(__dirname, '../files/data.txt');
 
 
 const getFileData = () =>{

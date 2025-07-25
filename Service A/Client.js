@@ -9,14 +9,11 @@ const client = new summationPackage.Summation('localhost:4000', grpc.credentials
 
 const a = parseInt(process.argv[2], 10);
 const b = parseInt(process.argv[3], 10);
-
 client.sumTwoNumbers({
-    "a" : a,
-    "b" : b
-},
+        "a" : a,
+        "b" : b
+    },
     (err, response) => {
-    console.log(JSON.stringify(response));
-})
-
-
+        console.log(JSON.stringify(response));
+    })
 
