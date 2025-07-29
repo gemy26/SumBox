@@ -7,7 +7,32 @@ const metricsMiddleware = require('./middlewares/metricsMiddleware');
 
 const app = express();
 
-kafkaConsumer.RecieveMessages();
+// Initialize Kafka consumer with retry mechanism
+async function initializeKafkaConsumer() {
+    let retries = 0;
+    const maxRetries = 5;
+
+    while (retries < maxRetries) {
+        try {
+            await kafkaConsumer.RecieveMessages();
+            console.log('Kafka consumer initialized successfully');
+            break;
+        } catch (err) {
+            retries++;
+            console.error(`Failed to initialize Kafka consumer (attempt ${retries}/${maxRetries}):`, err);
+            
+            if (retries >= maxRetries) {
+                console.error('Failed to initialize Kafka consumer after max retries');
+                process.exit(1);
+            }
+            
+            // Wait before retrying
+            await new Promise(resolve => setTimeout(resolve, Math.min(1000 * Math.pow(2, retries), 10000)));
+        }
+    }
+}
+
+initializeKafkaConsumer();
 
 app.use(express.json());
 
@@ -26,6 +51,14 @@ app.get('/summation',(req, res) => {
 app.get('/metrics', async (req, res) => {
     res.set('Content-Type', register.contentType);
     res.end(await register.metrics());
+})
+
+app.get('/random', (req, res) => {
+    let random = Math.floor(Math.random() * 10);
+    let status = [200, 201, 300, 400, 401, 405, 500];
+    let randomStatus = status[random % 7];
+    res.status(randomStatus);
+    res.end();
 })
 
 app.listen(3000, "0.0.0.0", () => {

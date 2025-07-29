@@ -1,5 +1,5 @@
 require('dotenv').config();
-const startServer = require('./Server');
+const startServer = require('./grpc/Server');
 const setupKafka = require('./kafka/kafkaSetup');
 const sequelize = require('./db/config');
 require('./jobs/outboxJob');

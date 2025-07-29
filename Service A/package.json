@@ -14,7 +14,9 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.13.4",
     "@grpc/proto-loader": "^0.7.15",
+    "bullmq": "^5.56.8",
     "dotenv": "^17.2.0",
+    "k6": "^0.0.0",
     "kafkajs": "^2.2.4",
     "pg": "^8.16.3",
     "sequelize": "^6.37.7"

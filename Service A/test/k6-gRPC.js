@@ -1,6 +1,9 @@
 import { Client, StatusOK } from 'k6/net/grpc';
 import { check, sleep } from 'k6';
 
+const client = new Client();
+client.load(['/scripts/protos'], 'Summation.proto');
+
 export const options = {
     thresholds: {
         grpc_req_duration: ['p(95)<300', 'p(99)<800'],
@@ -51,15 +54,11 @@ export const options = {
     }
 };
 
-const client = new Client();
 
-export function setup() {
-    client.load(['../protos'], 'Summation.proto');
-}
+
 
 export default function () {
-    // Connect to the gRPC server
-    client.connect('host.docker.internal:4000', {
+    client.connect('service-a:4000', {
         plaintext: true,
     });
 

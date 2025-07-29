@@ -34,10 +34,12 @@ class KafkaProducer {
             });
 
             console.log(`Sent successfully: ${JSON.stringify(result)}`);
-            return result;
+            return true;
         } catch(err) {
             console.log(`Error sending message: ${err}`);
-            throw err;
+            this.connected = false;
+            await this.connect();
+            return false;
         }
     }
 

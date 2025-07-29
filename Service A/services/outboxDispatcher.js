@@ -3,35 +3,38 @@ const outboxService = require('./outboxServices');
 const { Op } = require("sequelize");
 const sequelize = require('../db/config');
 
-async function dispatch() { //outbox Events
-    //call the queue 
-    const events = await outboxService.getPendingEvents();
-    console.log(`Found ${events.length} events to dispatch`);
-    let transaction;
-    for (const event of events) {
-        const success = await kafkaProducer.sendMessage(event.payload);
-        console.log(`Sent message with ID ${event.id} to Kafka`);
-        try{
-            transaction = await sequelize.transaction();
-            console.log(`After creating transaction`);
-        }catch (err){
-            console.error('Failed to create transaction:', err);
-        }
+async function dispatch() {
+    try {
+        const events = await outboxService.getPendingEvents();
+        console.log(`Found ${events.length} events to dispatch`);
 
-        try {
-            if (success) {
-                console.log(`Updated event ${event.id} as sent`);
-                await outboxService.markEventAsSent(event.id, transaction);
-            } else {
-                console.log(`Updated event ${event.id} as failed`);
-                await outboxService.markEventAsFailed(event.id, transaction);
+        for (const event of events) {
+            let transaction;
+            try {
+                transaction = await sequelize.transaction();
+                
+                const success = await kafkaProducer.sendMessage(event.payload);
+                console.log(`Sent message with ID ${event.id} to Kafka`);
+
+                if (success) {
+                    console.log(`Updating event ${event.id} as sent`);
+                    await outboxService.markEventAsSent(event.id, transaction);
+                } else {
+                    console.log(`Updating event ${event.id} as failed`);
+                    await outboxService.markEventAsFailed(event.id, transaction);
+                }
+
+                await transaction.commit();
+                console.log(`Successfully processed event ${event.id}`);
+            } catch (err) {
+                console.error(`Failed to process event ${event.id}:`, err);
+                if (transaction) await transaction.rollback();
             }
-            await transaction.commit();
-        } catch (err) {
-            console.error(`DB update failed for event ${event.id}:`, err);
-            await transaction.rollback();
         }
+    } catch (err) {
+        console.error('Failed to fetch pending events:', err);
     }
 }
+
 
 module.exports = dispatch;

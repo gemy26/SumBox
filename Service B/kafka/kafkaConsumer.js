@@ -1,5 +1,5 @@
-const { Kafka } = require('kafkajs')
-const {queue_latency} = require('../metrics/prometheusMetrices')
+const { Kafka } = require('kafkajs');
+const { queue_latency } = require('../metrics/prometheusMetrices');
 const storageService = require('../services/storageService');
 
 class KafkaConsumer {
@@ -13,7 +13,7 @@ class KafkaConsumer {
     }
 
     async connect() {
-        if(!this.connected){
+        if (!this.connected) {
             console.log("Consumer connecting...");
             await this.consumer.connect();
             console.log("Consumer connected!");
@@ -28,11 +28,11 @@ class KafkaConsumer {
             await this.consumer.subscribe({
                 "topic": process.env.SUMMATION_TOPIC,
                 "fromBeginning": true
-            })
+            });
 
             await this.consumer.run({
-                "eachMessage" : async ({ topic, partition, message }) => {
-                    try{
+                "eachMessage": async ({ topic, partition, message }) => {
+                    try {
                         const raw = message.value.toString();
                         const parsed = JSON.parse(raw);
 
@@ -43,23 +43,30 @@ class KafkaConsumer {
                             latency
                         );
 
-
                         console.log(`Recieved message: ${JSON.stringify(parsed)} on topic: ${topic}`);
 
                         let recievedData = parseInt(parsed.message.payload.sum) || 0;
                         storageService.saveFileData(recievedData + storageService.getFileData());
-                    }catch (err){
+                    } catch (err) {
                         console.error(`There is an error ${err}`);
                     }
                 }
-            })
+            });
 
-        }catch (err) {
+        } catch (err) {
             console.log(`There is an error ${err}`);
             throw err;
         }
     }
 
-}
+    async disconnect() {
+        if (this.connected) {
+            console.log("Consumer disconnecting...");
+            await this.consumer.disconnect();
+            console.log("Consumer disconnected!");
+            this.connected = false;
+        }
+    }
+} 
 
 module.exports = new KafkaConsumer();
