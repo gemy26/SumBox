@@ -1,10 +1,11 @@
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
-const Send = require('./kafka/kafkaProducer');
-const outboxServices  = require('./services/outboxServices');
-const sequelize = require('./db/config');
+const Send = require('../kafka/kafkaProducer');
+const outboxServices  = require('../services/outboxServices');
+const sequelize = require('../db/config');
+const path = require('path');
 
-const packageDef = protoLoader.loadSync('./Summation.proto');
+const packageDef = protoLoader.loadSync(path.join(__dirname, '../protos/Summation.proto'));
 const grpcObject = grpc.loadPackageDefinition(packageDef);
 const summationPackage = grpcObject.summationPackage;
 

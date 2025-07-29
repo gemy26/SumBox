@@ -1,7 +1,9 @@
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
+const path = require('path');
 
-const packageDef = protoLoader.loadSync('./Summation.proto');
+const packageDef = protoLoader.loadSync(path.join(__dirname, '../protos/Summation.proto'));
+
 const grpcObject = grpc.loadPackageDefinition(packageDef);
 const summationPackage = grpcObject.summationPackage;
 
